@@ -10,7 +10,7 @@
         </style>
         <script src="https://threejs.org/build/three.min.js"></script>
         <script src="Driver.js"></script>
-        <script id="vertexShader" type="x-shader/x-vertex">
+        <script id="phong-vs" type="x-shader/x-vertex">
             precision mediump float;
 
             uniform mat4 modelMatrix;
@@ -18,15 +18,26 @@
             uniform mat4 viewMatrix;
 
             attribute vec3 position;
+            attribute vec3 normal;
+
+            uniform vec3 l1_pos;
+            uniform vec3 l2_pos;
+            uniform vec3 l3_pos;
+
+            varying vec3 norm, l1, l2, l3, view_vec;
 
             void main(){
-                vec4 position = viewMatrix * modelMatrix * vec4(position, 1.0);
-                gl_position = projectionMatrix * position;
+                view_vec = normalize(-position);
+                norm = normalize(normal);
+                l1 = l1_pos;
+                l2 = l2_pos;
+                l3 = l3_pos;
+                gl_Position = viewMatrix * modelMatrix * projectionMatrix * vec4(position.xyz,0.0);
             }
 
         </script>
 
-        <script id="fragmentShader" type="x-shader/x-fragment">
+        <script id="phong-fs" type="x-shader/x-fragment">
             void main(){
                 gl_FragColor = vec4(1.0,0.0,0.0,0.0);
             }
