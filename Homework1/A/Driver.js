@@ -2,8 +2,8 @@
 // bgingell@ucsc.edu
 // 1/17/18
 
-let vertex_shader = document.getElementById('vertexShader').textContent;
-let frag_shader = document.getElementById('fragmentShader').texContent;
+let phong_vs = document.getElementById('phong-vs').textContent;
+let phong_fs = document.getElementById('phong-fs').textContent;
 
 function main(){
 

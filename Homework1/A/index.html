@@ -8,8 +8,7 @@
             body {margin:0;}
             canvas{width:100%; height:100%}
         </style>
-        <script src="https://threejs.org/build/three.min.js"></script>
-        <script src="Driver.js"></script>
+
         <script id="phong-vs" type="x-shader/x-vertex">
             precision mediump float;
 
@@ -38,10 +37,64 @@
         </script>
 
         <script id="phong-fs" type="x-shader/x-fragment">
+            precision mediump float;
+
+            varying vec3 norm, l1, l2, l3, view_vec;
+            float shininess = 30.0;
+
+            uniform vec3 l1_diff, l2_diff, l3_diff;
+            uniform vec3 l1_spec, l2_spec, l3_spec;
+
             void main(){
-                gl_FragColor = vec4(1.0,0.0,0.0,0.0);
+                vec4 outColor1 = vec4(0.0);
+                vec4 outColor2 = vec4(0.0);
+                vec4 outColor3 = vec4(0.0);
+
+                float diff1 = max(0.0, dot(norm, l1));
+                vec3 color1 = diff1 * l1_diff;
+
+                vec3 r1 = normalize(reflect(-l1, N));
+                float spec1 = pow(max(0.0, dot(r1, view_vec)), shininess);
+
+                color1 += spec1 * l1_spec;
+                if(spec1 > 1.0){
+                    outColor1 = vec4(l1_spec, 1.0);
+                } else {
+                    outColor1 = clamp(vec4(color1, 1.0), 0.0, 1.0)
+                }
+
+                float diff2 = max(0.0, dot(norm, l2));
+                vec3 color2 = diff2 * l2_diff;
+
+                vec3 r2 = normalize(reflect(-l2, N));
+                float spec2 = pow(max(0.0, dot(r2, view_vec)), shininess);
+
+                color2 += spec2* l2_spec;
+                if(spec2  > 1.0){
+                    outColor2 = vec4(l2_spec, 1.0);
+                } else {
+                    outColor2 = clamp(vec4(color2, 1.0), 0.0, 1.0)
+                }
+
+                float diff3 = max(0.0, dot(norm, l3));
+                vec3 color3 = diff3 * l3_diff;
+
+                vec3 r3 = normalize(reflect(-l3, N));
+                float spec3 = pow(max(0.0, dot(r3, view_vec)), shininess);
+
+                color3 += spec3* l3_spec;
+                if(spec3 > 1.0){
+                    outColor1 = vec4(l3_spec, 1.0);
+                } else {
+                    outColor3 = clamp(vec4(color3, 1.0), 0.0, 1.0)
+                }
+
+                gl_FragColor = clamp(outColor1 + outColor2 + outColor3, 0.0, 1.0);
+
             }
         </script>
+        <script src="https://threejs.org/build/three.min.js"></script>
+        <script src="Driver.js"></script>
     <head>
     <body onload="main()">
     </body>
