@@ -62,9 +62,10 @@ function init_lights( lights){
     let l3_spec = new THREE.Vector3(1.0, 0.0, 0.0);
     light3.push(l3_pos); light3.push(l3_diff); light3.push(l3_spec);
     lights.push(light3);
-
+    let tex = new THREE.TextureLoader().load('sky_cloud.jpg');
     let ambient = new THREE.Vector3(0.1,0.1,0.1);
     var uniforms =  {
+        tex: {type: "t", value: tex},
         ambient: { type: "v3", value: ambient },
         light1_pos: { type: "v3", value: lights[0][0]},
         light1_diffuse: { type: "v3", value: lights[0][1] },
