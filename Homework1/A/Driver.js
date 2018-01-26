@@ -22,12 +22,10 @@ function main(){
     // position, diffuse, specular
     let lights = [];
     let phong_material = init_lights(lights);
-
-    let geo_one = new THREE.SphereGeometry(.5, 32, 32);
+    let geo_one = new THREE.SphereGeometry(1, 64, 64);
+    let mat2 = new THREE.MeshPhongMaterial();
     mesh1 = new THREE.Mesh(geo_one, phong_material);
-    console.log(mesh1);
     scene.add(mesh1);
-
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x999999);
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -65,17 +63,20 @@ function init_lights( lights){
     light3.push(l3_pos); light3.push(l3_diff); light3.push(l3_spec);
     lights.push(light3);
 
-    let uniforms = {
-        l1_pos: {type: "v3", value: lights[0][0] },
-        l1_diff: {type: "v3", value:lights[0][1]},
-        l1_spec: {type: "v3", value:lights[0][2]},
-        l2_pos: {type: "v3", value: lights[1][0] },
-        l2_diff: {type: "v3", value:lights[1][1]},
-        l2_spec: {type: "v3", value:lights[1][2]},
-        l3_pos: {type: "v3", value: lights[2][0] },
-        l3_diff: {type: "v3", value:lights[2][1]},
-        l3_spec: {type: "v3", value:lights[2][2]},
-    }
+    let ambient = new THREE.Vector3(0.1,0.1,0.1);
+    var uniforms =  {
+        ambient: { type: "v3", value: ambient },
+        light1_pos: { type: "v3", value: lights[0][0]},
+        light1_diffuse: { type: "v3", value: lights[0][1] },
+        light1_specular:  { type: "v3", value: lights[0][2]},
+        light2_pos: { type: "v3", value: lights[1][0]},
+        light2_diffuse: { type: "v3", value: lights[1][1] },
+        light2_specular:  { type: "v3", value: lights[1][2] },
+        light3_pos:{ type: "v3", value: lights[2][0]},
+        light3_diffuse:{type: "v3", value: lights[2][1]},
+        light3_specular:{type: "v3", value:lights[2][2]},
+    };
+
 
     let phong_material = new THREE.RawShaderMaterial( {
         uniforms: uniforms,

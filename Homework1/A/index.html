@@ -6,101 +6,105 @@
         <meta charset="utf-8">
         <style>
             body {margin:0;}
-            canvas{width:100%; height:100%}
         </style>
-        <script src="../three.js"></script>
-        <script src="Driver.js"></script>
         <script id="phong-vs" type="x-shader/x-vertex">
-            precision mediump float;
 
-            uniform mat4 modelMatrix;
-            uniform mat4 viewMatrix;
-            uniform mat4 projectionMatrix;
+        uniform mat4 modelMatrix;
+        uniform mat4 viewMatrix;
+        uniform mat4 projectionMatrix;
 
-            attribute vec3 position;
-            attribute vec3 normal;
+        attribute vec3 position;
+        attribute vec3 normal;
 
-            uniform vec3 l1_pos;
-            uniform vec3 l2_pos;
-            uniform vec3 l3_pos;
+        uniform vec3 light1_pos;
+        uniform vec3 light2_pos;
+        uniform vec3 light3_pos;
 
-            varying vec3 norm, l1, l2, l3, view_vec;
+        varying vec3 N, L1, L2, L3, V;
 
-            void main(){
-                // shift to cam coords
-                vec4 pos = viewMatrix * modelMatrix * vec4(position, 0.0);
-                vec3 p = pos.xyz;
-                view_vec = normalize(-p) ;
-                norm =vec3( normalize(viewMatrix * modelMatrix * vec4(normal.xyz, 0.0) ).xyz);
-                vec4 l1_cam = viewMatrix * vec4(l1_pos, 1.0);
-                vec4 l2_cam = viewMatrix * vec4(l2_pos, 1.0);
-                vec4 l3_cam = viewMatrix * vec4(l3_pos, 1.0);
-                l1 = vec3(normalize(l1_cam - pos).xyz);
-                l2 = vec3(normalize(l2_cam - pos).xyz);
-                l3 = vec3(normalize(l3_cam - pos).xyz);
-                gl_Position =projectionMatrix * pos;
-            }
+        void main() {
+            vec4 position = viewMatrix * modelMatrix * vec4(position, 1.0);
+            vec3 P = position.xyz;
+            N = vec3(normalize(viewMatrix * modelMatrix * vec4(normal.xyz, 0.0)  ).xyz) ;
+            vec4 L1_cam = viewMatrix * vec4(light1_pos, 1.0);
+            vec4 L2_cam = viewMatrix * vec4(light2_pos, 1.0);
+            vec4 L3_cam = viewMatrix * vec4(light3_pos, 1.0);
+            L1 = vec3(normalize(L1_cam - position).xyz);
+            L2 = vec3(normalize(L2_cam - position).xyz);
+            L3 = vec3(normalize(L3_cam - position).xyz);
+            V = normalize(-P);
+            gl_Position = projectionMatrix * position;
+        }
 
         </script>
 
         <script id="phong-fs" type="x-shader/x-fragment">
-            precision mediump float;
+        precision mediump float;
 
-            varying vec3 norm, l1, l2, l3, view_vec;
-            float shininess = 32.0;
+        varying vec3 V, N, L1, L2, L3;        //specular highlights depend upon the position/orientation of the camera and the direction of the light reflecting off of this geometry
 
-            uniform vec3 l1_diff, l2_diff, l3_diff;
-            uniform vec3 l1_spec, l2_spec, l3_spec;
+        float spec_intensity = 32.0; //higher value indicates more rapid falloff
 
-            void main(){
-                vec4 outColor1 = vec4(0.0);
-                vec4 outColor2 = vec4(0.0);
-                vec4 outColor3 = vec4(0.0);
+        uniform vec3 ambient; //general ambient light in the scene applied to all objects
 
-                float diff1 = max(0.0, dot(norm, l1));
-                vec3 color1 = diff1 * l1_diff;
+        uniform vec3 light1_diffuse;
+        uniform vec3 light2_diffuse;
+        uniform vec3 light3_diffuse;
 
-                vec3 r1 = normalize(reflect(-l1, norm));
-                float spec1 = pow(max(0.0, dot(r1, view_vec)), shininess);
+        uniform vec3 light1_specular;
+        uniform vec3 light2_specular;
+        uniform vec3 light3_specular;
 
-                color1 += spec1 * l1_spec;
-                if(spec1 > 1.0){
-                    outColor1 = vec4(l1_spec, 1.0);
-                } else {
-                    outColor1 = clamp(vec4(color1, 1.0), 0.0, 1.0);
-                }
+        void main() {
+            vec4 outColor1 = vec4(0.0);
+            vec4 outColor2 = vec4(0.0);
+            vec4 outColor3 = vec4(0.0);
 
-                float diff2 = max(0.0, dot(norm, l2));
-                vec3 color2 = diff2 * l2_diff;
+            //diffuse light depends on the angle between the light and the vertex normal
+            float diff1 = max(0.0, dot(N, L1)); //just to make sure not negative
+            vec3 color1 = diff1 * light1_diffuse;
 
-                vec3 r2 = normalize(reflect(-l2, norm));
-                float spec2 = pow(max(0.0, dot(r2, view_vec)), shininess);
+            vec3 R1 = normalize(reflect(-L1,N)); //get light vector reflected across the plane defined by the normal of this geometry
+            float spec1 = pow( max(dot(R1, V), 0.0), spec_intensity); //raising the value to a particular intensity value shrinks the size of the specular highlight so that only a reflection vector (R1) that is very close to the view vector (V) will be applied to this fragment.
 
-                color2 += spec2* l2_spec;
-                if(spec2  > 1.0){
-                    outColor2 = vec4(l2_spec, 1.0);
-                } else {
-                    outColor2 = clamp(vec4(color2, 1.0), 0.0, 1.0);
-                }
-
-                float diff3 = max(0.0, dot(norm, l3));
-                vec3 color3 = diff3 * l3_diff;
-
-                vec3 r3 = normalize(reflect(-l3, norm));
-                float spec3 = pow(max(0.0, dot(r3, view_vec)), shininess);
-
-                color3 += spec3* l3_spec;
-                if(spec3 > 1.0){
-                    outColor1 = vec4(l3_spec, 1.0);
-                } else {
-                    outColor3 = clamp(vec4(color3, 1.0), 0.0, 1.0);
-                }
-
-                //gl_FragColor = clamp(vec4(0.1,0.1,0.1, 1.0) +  outColor1 + outColor2 + outColor3, 0.0, 1.0);
-                gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            color1 += spec1 * light1_specular;
+            if (spec1 > 1.0) {
+                outColor1 = vec4(light1_specular,1.0);
+            } else {
+                outColor1 = clamp(vec4(color1,1.0), 0.0,1.0);
             }
-        </script>
 
+            //diffuse
+            float diff2 = max(0.0, dot(N, L2));
+            vec3 color2 = diff2 * light2_diffuse;
+
+            //specular
+            vec3 R2 = normalize(reflect(-L2,N));
+            float spec2 = pow( max(dot(R2, V), 0.0), spec_intensity);
+            color2 += spec2 * light2_specular;
+            if (spec2 > 1.0) {
+                outColor2 = vec4(light2_specular,1.0);
+            } else {
+                outColor2 = clamp(vec4(color2,1.0), 0.0,1.0);
+            }
+            //diffuse
+            float diff3 = max(0.0, dot(N, L2));
+            vec3 color3= diff3 * light3_diffuse;
+
+            //specular
+            vec3 R3 = normalize(reflect(-L3,N));
+            float spec3 = pow( max(dot(R3, V), 0.0), spec_intensity);
+            color3 += spec3 * light3_specular;
+            if (spec3 > 1.0) {
+                outColor3 = vec4(light3_specular,1.0);
+            } else {
+                outColor3 = clamp(vec4(color3,1.0), 0.0,1.0);
+            }
+            gl_FragColor = clamp(vec4(ambient, 1.0) + outColor1 + outColor2 + outColor3, 0.0, 1.0);
+        }
+        </script>
+        <script src="../three.js"></script>
+        <script src="Driver.js"></script>
     <head>
     <body onload="main()">
         <div id="container"></div>
