@@ -29,10 +29,33 @@ function main(){
     mesh1.position.x -= 3;
     scene.add(mesh1);
 
-    let geo_two = new THREE.RingGeometry()
+    let geo_two = new THREE.OctahedronGeometry()
     mesh2 = new THREE.Mesh(geo_two);
     scene.add(mesh2);
-    
+
+    // loading in a GolfCart
+    var loader = new THREE.OBJLoader(  );
+    let GolfCart;
+    /* This is the work of Emil Persson, aka Humus.
+    http://www.humus.name */
+	loader.load( 'GolfCart.obj', function ( object ) {
+
+		object.traverse( function ( child ) {
+			if ( child instanceof THREE.Mesh ) {
+				child.material;
+			}
+		} );
+
+		var s = 0.2;
+		object.scale.set( s, s, s );
+		object.position.x += 8.0;
+		object.position.y += 2.5;
+        object.position.z -= 8;
+        object.rotation.z -= 90;
+
+		GolfCart = object;
+		scene.add( GolfCart );
+	} );
     renderer = new THREE.WebGLRenderer();
     renderer.setClearColor(0x999999);
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -41,7 +64,10 @@ function main(){
     function animate() {
         requestAnimationFrame( animate );
         move_lights(lights, lightdirs);
+        mesh2.rotation.z += 0.004;
+        mesh2.rotation.x += 0.004;
         mesh1.position.z -= 0.025;
+        GolfCart.rotation.y += 0.004;
         renderer.render( scene, camera );
     }
     animate();
@@ -50,7 +76,6 @@ function main(){
 
 }
 function move_lights(lights, lightdirs){
-    console.log(lightdirs);
     if(lightdirs[0] == 1){
         lights[0][0].x += 0.25;
         if(lights[0][0].x >= 10) lightdirs[0] = 0;
