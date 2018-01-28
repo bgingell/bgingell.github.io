@@ -1,7 +1,7 @@
 // Brent Gingell
 // bgingell@ucsc.edu
 // 1/17/18
-
+// does box blur on a picture
 let vs = document.getElementById('vertexShader').textContent;
 let fs = document.getElementById('fragmentShader').textContent;
 
