@@ -28,9 +28,19 @@ function main(){
     mesh1 = new THREE.Mesh(geo_one, phong_material);
     mesh1.position.x -= 3;
     scene.add(mesh1);
-
+    let size_changer = 0.0;
+    let go_bigger = true;
+    let ch_size = [size_changer,go_bigger]
+    let uni2 = {
+        size_changer: {type:"f", value:ch_size[0]},
+    }
+    let two_material = new THREE.RawShaderMaterial( {
+        uniforms: uni2,
+        vertexShader: document.getElementById('two-vs').textContent,
+        fragmentShader: document.getElementById('two-fs').textContent,
+    } );
     let geo_two = new THREE.OctahedronGeometry()
-    mesh2 = new THREE.Mesh(geo_two);
+    mesh2 = new THREE.Mesh(geo_two, two_material);
     scene.add(mesh2);
 
     // loading in a GolfCart
@@ -42,7 +52,7 @@ function main(){
 
 		object.traverse( function ( child ) {
 			if ( child instanceof THREE.Mesh ) {
-				child.material;
+				child.material = two_material;
 			}
 		} );
 
@@ -64,6 +74,7 @@ function main(){
     function animate() {
         requestAnimationFrame( animate );
         move_lights(lights, lightdirs);
+        change_size(ch_size);
         mesh2.rotation.z += 0.004;
         mesh2.rotation.x += 0.004;
         mesh1.position.z -= 0.025;
@@ -71,9 +82,16 @@ function main(){
         renderer.render( scene, camera );
     }
     animate();
+}
 
-
-
+function change_size(ch_size){
+    if(ch_size[1]){
+        ch_size[0] += 50;
+        if(ch_size[0] >= 5000) ch_size[1] = false;
+    } else {
+        ch_size[0] -= 50;
+        if(ch_size[0] <= 0) ch_size[1] = true;
+    }
 }
 function move_lights(lights, lightdirs){
     if(lightdirs[0] == 1){

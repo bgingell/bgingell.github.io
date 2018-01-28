@@ -113,6 +113,28 @@
             gl_FragColor = mix(phong, tex_color, 0.5);
         }
         </script>
+        <script id="two-vs" type="x-shader/x-vertex">
+            uniform mat4 modelMatrix;
+            uniform mat4 viewMatrix;
+            uniform mat4 projectionMatrix;
+            uniform float size_changer;
+
+            attribute vec3 position;
+
+            void main(){
+                vec3 pos = position;
+                // vert displacement
+                pos.x += sin(pos.x * 20.0 * size_changer);
+                pos.y += cos(pos.y * 10.0 * size_changer) * 3.2;
+                pos.z += sin(pos.z * 30.0 * size_changer) * 16.0;
+                gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(pos, 1.0);
+            }
+        </script>
+        <script id="two-fs" type="x-shader/x-fragment">
+            void main(){
+                gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+            }
+        </script>
         <script src="three.js"></script>
         <script src="OBJLoader.js"></script>
         <script src="Driver.js"></script>
