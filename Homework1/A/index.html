@@ -135,6 +135,36 @@
                 gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
             }
         </script>
+
+        <script id="three-vs" type="x-shader/x-vertex">
+            uniform mat4 modelMatrix;
+            uniform mat4 viewMatrix;
+            uniform mat4 projectionMatrix;
+
+            attribute vec3 position;
+
+            varying vec3 vPosition;
+            varying vec4 vColor;
+            void main(){
+                vPosition = position;
+                vColor = vec4(0.0, 0.4, 0.8, 1.0);
+                gl_Position =projectionMatrix * viewMatrix * modelMatrix * vec4(position, 1.0);
+            }
+        </script>
+
+        <script id="three-fs" type="x-shader/x-fragment">
+            precision mediump float;
+
+            uniform float size_changer;
+            varying vec3 vPosition;
+            varying vec4 vColor;
+            void main(){
+                vec4 color= vec4(vColor);
+                color.b += cos(size_changer + 12.25 * vPosition.z) * 0.5;
+                color.g += sin(size_changer + 4.23 * vPosition.x) * 0.7;
+                gl_FragColor = color;
+            }
+        </script>
         <script src="three.js"></script>
         <script src="OBJLoader.js"></script>
         <script src="Driver.js"></script>

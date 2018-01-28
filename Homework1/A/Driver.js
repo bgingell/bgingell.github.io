@@ -43,6 +43,12 @@ function main(){
     mesh2 = new THREE.Mesh(geo_two, two_material);
     scene.add(mesh2);
 
+    let uni3 = uni2;
+    let three_material = new THREE.RawShaderMaterial({
+        uniforms: uni2,
+        vertexShader: document.getElementById('three-vs').textContent,
+        fragmentShader: document.getElementById('three-fs').textContent,
+    });
     // loading in a GolfCart
     var loader = new THREE.OBJLoader(  );
     let GolfCart;
@@ -52,17 +58,15 @@ function main(){
 
 		object.traverse( function ( child ) {
 			if ( child instanceof THREE.Mesh ) {
-				child.material = two_material;
+				child.material = three_material;
 			}
 		} );
 
 		var s = 0.2;
 		object.scale.set( s, s, s );
 		object.position.x += 8.0;
-		object.position.y += 2.5;
+		object.position.y -= 2.0;
         object.position.z -= 8;
-        object.rotation.z -= 90;
-
 		GolfCart = object;
 		scene.add( GolfCart );
 	} );
@@ -78,7 +82,8 @@ function main(){
         mesh2.rotation.z += 0.004;
         mesh2.rotation.x += 0.004;
         mesh1.position.z -= 0.025;
-        GolfCart.rotation.y += 0.004;
+        GolfCart.rotateX(.01);
+        GolfCart.rotateZ(.01);
         renderer.render( scene, camera );
     }
     animate();
