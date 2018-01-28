@@ -1,0 +1,37 @@
+
+<DOCTYPE html>
+<html lang="en">
+    <head>
+        <title> Question A - Three.js scene</title>
+        <meta charset="utf-8">
+        <style>
+            body {margin:0;}
+            canvas{width:100%; height:100%}
+        </style>
+        <script src="https://threejs.org/build/three.min.js"></script>
+        <script src="Driver.js"></script>
+        <script id="vertexShader" type="x-shader/x-vertex">
+            precision mediump float;
+
+            uniform mat4 modelMatrix;
+            uniform mat4 projectionMatrix;
+            uniform mat4 viewMatrix;
+
+            attribute vec3 position;
+
+            void main(){
+                vec4 position = viewMatrix * modelMatrix * vec4(position, 1.0);
+                gl_position = projectionMatrix * position;
+            }
+
+        </script>
+
+        <script id="fragmentShader" type="x-shader/x-fragment">
+            void main(){
+                gl_FragColor = vec4(1.0,0.0,0.0,0.0);
+            }
+        </script>
+    <head>
+    <body onload="main()">
+    </body>
+</html>
