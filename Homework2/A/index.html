@@ -1,0 +1,54 @@
+<DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Part A - Outdoor Scene</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background:#777;
+				padding:0;
+				margin:0;
+				overflow:hidden;
+			}
+			#info {
+				position: absolute;
+				top: 0px;
+				width: 100%;
+				color: #ffffff;
+			}
+		</style>
+        <script id="skybox-vs" type="x-shader/x-vertex">
+        uniform mat4 modelMatrix;
+        uniform mat4 viewMatrix;
+        uniform mat4 projectionMatrix;
+
+        attribute vec3 position;
+
+        varying vec3 vWorldPosition;
+
+        void main() {
+            vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+            vWorldPosition = worldPosition.xyz;
+            vec4 p = viewMatrix * modelMatrix * vec4(position, 1.0);
+            gl_Position = projectionMatrix * p;
+        }
+        </script>
+        <script id="skybox-fs" type="x-shader/x-fragment">
+        precision mediump float;
+
+        uniform samplerCube tCube;
+        varying vec3 vWorldPosition;
+
+        void main() {
+            gl_FragColor = textureCube( tCube, vec3(  vWorldPosition ) );
+        }
+        </script>
+        <script src="../js/three.js"></script>
+        <script src="Driver.js"></script>
+    <head>
+    <body>
+        <div id="container"></div>
+        <script>main()</script>
+    </body>
+</html>
