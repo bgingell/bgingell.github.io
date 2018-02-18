@@ -172,10 +172,10 @@ THREE.GPUParticleSystem = function ( options ) {
 
 	var textureLoader = new THREE.TextureLoader();
 
-	this.particleNoiseTex = this.PARTICLE_NOISE_TEXTURE || textureLoader.load( 'perlin-512.png' );
+	this.particleNoiseTex = this.PARTICLE_NOISE_TEXTURE || textureLoader.load( '../B/perlin-512.png' );
 	this.particleNoiseTex.wrapS = this.particleNoiseTex.wrapT = THREE.RepeatWrapping;
 
-	this.particleSpriteTex = this.PARTICLE_SPRITE_TEXTURE || textureLoader.load( 'particle2.png' );
+	this.particleSpriteTex = this.PARTICLE_SPRITE_TEXTURE || textureLoader.load( '../B/particle2.png' );
 	this.particleSpriteTex.wrapS = this.particleSpriteTex.wrapT = THREE.RepeatWrapping;
 
 	this.particleShaderMat = new THREE.ShaderMaterial( {
@@ -366,8 +366,8 @@ THREE.GPUParticleContainer = function ( maxParticles, particleSystem ) {
 		// color
 
 		color.r = THREE.Math.clamp( color.r + particleSystem.random() * colorRandomness, 0, 1 );
-		color.g = 1.0; THREE.Math.clamp( color.g + particleSystem.random() * colorRandomness, 0, 1 );
-		color.b = 0.0; THREE.Math.clamp( color.b + particleSystem.random() * colorRandomness, 0, 1 );
+		color.g = THREE.Math.clamp( color.g + particleSystem.random() * colorRandomness, 0, 1 );
+		color.b = THREE.Math.clamp( color.b + particleSystem.random() * colorRandomness, 0, 1 );
 
 		colorAttribute.array[ i * 3 + 0 ] = color.r;
 		colorAttribute.array[ i * 3 + 1 ] = color.g;
@@ -489,9 +489,7 @@ THREE.GPUParticleContainer = function ( maxParticles, particleSystem ) {
 	};
 
 	this.dispose = function () {
-
 		this.particleShaderGeo.dispose();
-
 	};
 
 	this.init();

@@ -13,14 +13,9 @@ function init() {
     container = document.getElementById( 'container' );
 
     camera = new THREE.PerspectiveCamera( 28, window.innerWidth / window.innerHeight, 1, 10000 );
-    camera.position.z = 100;
+    camera.position.z = 20;
 
     scene = new THREE.Scene();
-
-    // The GPU Particle system extends THREE.Object3D, and so you can use it
-    // as you would any other scene graph component.	Particle positions will be
-    // relative to the position of the particle system, but you will probably only need one
-    // system for your whole scene
 
     particleSystem = new THREE.GPUParticleSystem( {
         maxParticles: 250000
@@ -28,23 +23,22 @@ function init() {
 
     scene.add( particleSystem );
 
-    // options passed during each spawned
     options = {
-        position: new THREE.Vector3(-5.0,0.0,0.0),
-        positionRandomness: .3,
+        position: new THREE.Vector3(0.0,0.0,0.0),
+        positionRandomness: 1.5,
         velocity: new THREE.Vector3(0.0, 1.0, 0.0),
-        velocityRandomness: .11,
-        color: 0xaaaaaa,
-        colorRandomness: .2,
+        velocityRandomness: 0.0,
+        color: 0x111111,
+        colorRandomness: 0.0,
         turbulence: .5,
         lifetime: 2,
-        size: 5,
+        size: 40,
         sizeRandomness: 1
     };
 
     spawnerOptions = {
         spawnRate: 15000,
-        horizontalSpeed: 1.5,
+        horizontalSpeed: 0,
         verticalSpeed: 1.33,
         timeScale: 1
     };
@@ -52,7 +46,7 @@ function init() {
     //
 
     gui.add( options, "velocityRandomness", 0, 3 );
-    gui.add( options, "positionRandomness", 0, 3 );
+    gui.add( options, "positionRandomness", 1.5, 5 );
     gui.add( options, "size", 40, 80 );
     gui.add( options, "sizeRandomness", 0, 25 );
     gui.add( options, "colorRandomness", 0, 1 );
@@ -78,7 +72,6 @@ function init() {
         fragmentShader: fs,
     } );
     var mesh1 = new THREE.Mesh( geometry1, material1 );
-	mesh1.translateX(-1.0);
     scene.add( mesh1 );
 
     renderer = new THREE.WebGLRenderer();
@@ -134,10 +127,8 @@ function animate() {
 
 function render(tick) {
     var object0 = scene.children[ 1 ];
-//		object0.rotation.x = time * 0.0009;
-//		object0.rotation.y = time * 0.0005;
     object0.material.uniforms.in_val.value += 0.01;
-    object0.material.uniforms.displaceAmt.value = 2.0 * Math.sin(tick); //0.01;
+    object0.material.uniforms.displaceAmt.value = 2.0 * tick/20;
     renderer.render( scene, camera );
 
 }
