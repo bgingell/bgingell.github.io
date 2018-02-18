@@ -44,7 +44,98 @@
             gl_FragColor = textureCube( tCube, vec3(  vWorldPosition ) );
         }
         </script>
+
+        <script id="terr-vs" type="x-shader/x-vertex">
+        uniform mat4 modelMatrix;
+        uniform mat4 viewMatrix;
+        uniform mat4 projectionMatrix;
+        uniform sampler2D tPic;
+
+        attribute vec3 position;
+        attribute vec2 uv;
+        attribute vec3 normal;
+
+        uniform float displaceAmt; //controls the amount of vertex displacement...
+
+        varying float vDisplace;
+        varying vec2 vUV;
+
+        void main(){
+            vUV = uv;
+            vec4 color = texture2D(tPic, uv);
+            if(color.r > 0.0){
+                vDisplace = color.r * displaceAmt;
+            } else {
+                vDisplace = color.b * -displaceAmt;
+            }
+
+            vec3 p = (position.xyz + normal.xyz * vDisplace).xyz;
+
+            gl_Position = projectionMatrix * viewMatrix * modelMatrix * vec4(p, 1.0);
+        }
+        </script>
+
+        <script id="terr-fs" type="x-shader/x-fragment">
+        precision mediump float;
+
+        uniform sampler2D tGrass, tDirt, tRock;
+
+        varying vec2 vUV;
+        varying float vDisplace;
+
+        void main(){
+            vec4 grass = texture2D(tGrass, vUV);
+            vec4 dirt = texture2D(tDirt, vUV);
+            vec4 rock = texture2D(tRock, vUV);
+
+            float zOffset = vDisplace;
+
+            vec4 mix1 = mix(grass, rock, min(1.0, zOffset/20.0));
+            vec4 mix2 = mix(rock, dirt, zOffset/50.0);
+            vec4 mix3 = mix(mix1, mix2, zOffset/50.0);
+
+            gl_FragColor = vec4(mix3.rgb, 1.0);
+        }
+        </script>
+        <script id="water-vs" type="x-shader/x-vertex">
+        uniform mat4 modelMatrix;
+        uniform mat4 viewMatrix;
+        uniform mat4 projectionMatrix;
+
+        uniform vec3 cameraPosition;
+
+        attribute vec3 position;
+        attribute vec3 normal;
+
+        varying vec3 vI;
+        varying vec3 vWorldNormal;
+
+        void main() {
+            vec4 mvPosition = viewMatrix * modelMatrix * vec4( position, 1.0 );
+            vec4 worldPosition = modelMatrix * vec4( position, 1.0 );
+            vWorldNormal = normalize( mat3( modelMatrix[0].xyz, modelMatrix[1].xyz, modelMatrix[2].xyz ) * normal );
+            vI = worldPosition.xyz - cameraPosition;
+            gl_Position = projectionMatrix * mvPosition;
+        }
+        </script>
+        <script id="water-fs" type="x-shader/x-fragment">
+        precision mediump float;
+
+		uniform samplerCube envMap;
+        uniform sampler2D tex;
+
+		varying vec3 vI, vWorldNormal;
+
+		void main() {
+            vec4 c = vec4(0.0, 0.0, 0.9, 1.0);
+  			vec3 reflection = reflect( vI, vWorldNormal );
+  			vec4 envColor = textureCube( envMap, vec3( -reflection.x, reflection.yz ) );
+  			gl_FragColor = mix(vec4(envColor), c, 0.32);
+		}
+        </script>
         <script src="../js/three.js"></script>
+        <script src="../js/OrbitControls.js"></script>
+        <script src="../js/dat.gui.min.js"></script>
         <script src="Driver.js"></script>
     <head>
     <body>
