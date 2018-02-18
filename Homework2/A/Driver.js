@@ -77,7 +77,7 @@ function main(){
     let plane_mesh = new THREE.Mesh(plane, material2);
     plane_mesh.material.side = THREE.DoubleSide;
     plane_mesh.rotateX(-Math.PI/2);
-    plane_mesh.position.y = -20;
+    plane_mesh.position.y = -30;
     scene.add(plane_mesh);
 
 /******************* WATER ***************/
@@ -94,7 +94,7 @@ function main(){
     let water_mesh = new THREE.Mesh(water_plane, material3);
     water_mesh.material.side = THREE.DoubleSide;
     water_mesh.rotateX(-Math.PI/2);
-    water_mesh.position.y = -22;
+    water_mesh.position.y = -32;
     scene.add(water_mesh);
 
 
