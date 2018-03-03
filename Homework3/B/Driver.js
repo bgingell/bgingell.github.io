@@ -45,7 +45,7 @@ function main(){
 
     function animate(){
         requestAnimationFrame( animate );
-        rote = rote + 0.2;
+        rote = rote + 0.5;
         scene.children[0].material.uniforms.rote.value = rote;
         renderer.render(scene, camera);
     }
