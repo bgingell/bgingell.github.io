@@ -50,7 +50,7 @@
         }
 
         float smin(float a, float b){
-            float k = 32.0;
+            float k = 8.0;
             float res = exp(-k*a) + exp(-k*b);
             return -log(res)/k;
         }
@@ -75,6 +75,11 @@
             return max(length(p.xz)-c.x, abs(p.y) - c.y);
         }
 
+        float cylrectMorph(vec3 p){
+            float a = cylinderSDF(p);
+            float b = boxSDF(p, vec3(0.3 * sin(rote/90.0), 1.0, 0.3 * sin(rote/90.0)), 0.0);
+            return min(a,b);
+        }
         float boxtorusBlend(vec3 p){
             float d1 = boxSDF(p, vec3(0.5, 0.8, 0.5), -2.0);
             float d2 = torusSDF(p,vec2(0.5, 0.65), vec3(-2.0,1.0, 1.0));
@@ -90,7 +95,7 @@
 
         float sceneSDF(vec3 p){
             float a = boxtorusDiff(p);
-            float b = cylinderSDF(p);
+            float b = cylrectMorph(p);
             float c = boxtorusBlend(p);
 
             float min1 = min(a,b);
