@@ -155,7 +155,7 @@
             if(dist > 1000.0 - 0.001){
                 gl_FragColor = vec4(0.0,0.0,0.0,0.0);
             } else {
-                vec3 kd = vec3(1.0, 0.0, 0.0);
+                vec3 kd = vec3(1.0, 0.0, 1.0);
                 vec3 ka = vec3(0.1, 0.0, 0.0);
                 vec3 p = eye.xyz + dist * dir.xyz;
                 vec3 phong = vec3(phongShading(p.xyz, eye.xyz));
